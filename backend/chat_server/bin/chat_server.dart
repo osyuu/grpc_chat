@@ -17,15 +17,31 @@ Future<void> main() async {
 }
 
 class ChatServer extends ChatServiceBase {
-  final _controllers = <StreamController<Message>, void>{};
+  final _controllers = <StreamController<Message>, void Function()?>{};
+  final _messagesCache = <Message>[];
 
   @override
   Stream<Message> connect(ServiceCall call, Stream<Message> request) async* {
+    // Send cached messages to the new client
+    for (var message in _messagesCache) {
+      yield message;
+    }
+
     final clientController = StreamController<Message>();
     _controllers[clientController] = null;
 
     request.listen((request) {
       print('Connected: ${request.sender} #${request.hashCode}');
+      // Assign a unique ID and timestamp to the message
+      request.id = Uuid().v1();
+      request.createdAt = Timestamp.fromDateTime(DateTime.now());
+
+      if (_messagesCache.length >= 100) {
+        _messagesCache
+            .removeAt(0); // Remove the oldest message if cache is full
+      }
+      // Add the message to the cache
+      _messagesCache.add(request);
 
       _controllers.forEach((controller, _) {
         if (controller != clientController) {
@@ -42,8 +58,6 @@ class ChatServer extends ChatServiceBase {
 
     await for (var message in clientController.stream) {
       print('Received message: ${message.content}');
-      message.id = Uuid().v1();
-      message.createdAt = Timestamp.fromDateTime(DateTime.now());
       yield message;
     }
   }
