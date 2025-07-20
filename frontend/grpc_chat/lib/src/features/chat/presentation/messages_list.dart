@@ -12,9 +12,15 @@ class MessagesList extends ConsumerWidget {
     return AsyncValueWidget(
       value: messageValue,
       data: (message) {
-        return ListTile(
-          title: Text('${message.sender}: ${message.content}'),
-          trailing: Text(message.createdAt.toIso8601String()),
+        return ListView.builder(
+          itemCount: message.length,
+          itemBuilder: (context, index) {
+            final chatMessage = message[index];
+            return ListTile(
+              title: Text('${chatMessage.sender}: ${chatMessage.content}'),
+              trailing: Text(chatMessage.createdAt.toIso8601String()),
+            );
+          },
         );
       },
     );

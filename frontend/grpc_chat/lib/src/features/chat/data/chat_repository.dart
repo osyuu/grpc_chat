@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:grpc_chat/src/common_widgets/providers/channel.dart';
 import 'package:grpc_chat/src/features/chat/domain/chat_message.dart';
 import 'package:grpc_chat/src/generated/chat.pbgrpc.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ChatRepository {
   ChatRepository({
@@ -24,8 +25,11 @@ class ChatRepository {
   final StreamController<Message> _messageController =
       StreamController.broadcast();
 
-  Stream<ChatMessage> get watchMessages =>
-      _serverResponse.map(ChatMessage.fromProto);
+  ValueStream<List<ChatMessage>> get watchMessages =>
+      _serverResponse.map(ChatMessage.fromProto).scan<List<ChatMessage>>(
+        (acc, message, _) => [...acc, message],
+        [],
+      ).shareValueSeeded([]);
 
   void sendMessage(ChatMessage message) {
     final messageWithSender = message.copyWith(
