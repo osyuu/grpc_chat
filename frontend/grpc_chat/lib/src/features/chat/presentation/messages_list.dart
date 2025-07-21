@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:grpc_chat/src/common_widgets/async_value_widget.dart';
 import 'package:grpc_chat/src/features/chat/data/chat_repository.dart';
+import 'package:grpc_chat/src/features/chat/presentation/widgets/message_list_item.dart';
 
 class MessagesList extends ConsumerWidget {
   const MessagesList({super.key});
@@ -16,9 +17,10 @@ class MessagesList extends ConsumerWidget {
           itemCount: message.length,
           itemBuilder: (context, index) {
             final chatMessage = message[index];
-            return ListTile(
-              title: Text('${chatMessage.sender}: ${chatMessage.content}'),
-              trailing: Text(chatMessage.createdAt.toIso8601String()),
+            return MessageListItem(
+              message: chatMessage.content,
+              sender: chatMessage.sender,
+              timestamp: chatMessage.createdAt,
             );
           },
         );
