@@ -64,8 +64,3 @@ final chatRepositoryProvider = Provider.autoDispose<ChatRepository>((ref) {
   });
   return repository;
 });
-
-final messagesProvider = StreamProvider.autoDispose((ref) {
-  final repo = ref.watch(chatRepositoryProvider);
-  return repo.watchMessages;
-});

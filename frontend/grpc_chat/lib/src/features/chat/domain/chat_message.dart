@@ -10,13 +10,13 @@ class ChatMessage {
     required this.id,
     required this.sender,
     required this.content,
-    required this.createdAt,
+    this.createdAt,
   });
 
   final MessageID id;
   final String sender;
   final String content;
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   ChatMessage copyWith({
     MessageID? id,
@@ -32,28 +32,30 @@ class ChatMessage {
     );
   }
 
-  Map<String, Object> toMap() {
-    return <String, Object>{
+  Map<String, Object?> toMap() {
+    return {
       'id': id,
       'sender': sender,
       'content': content,
-      'createdAt': createdAt.millisecondsSinceEpoch,
+      'createdAt': createdAt?.millisecondsSinceEpoch,
     };
   }
 
-  factory ChatMessage.fromMap(Map<String, Object> map) {
+  factory ChatMessage.fromMap(Map<String, Object?> map) {
     return ChatMessage(
       id: map['id'] as MessageID,
       sender: map['sender'] as String,
       content: map['content'] as String,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+      createdAt: map['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int)
+          : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
   factory ChatMessage.fromJson(String source) =>
-      ChatMessage.fromMap(json.decode(source) as Map<String, Object>);
+      ChatMessage.fromMap(json.decode(source) as Map<String, Object?>);
 
   Message toProto() => Message(
         sender: sender,
