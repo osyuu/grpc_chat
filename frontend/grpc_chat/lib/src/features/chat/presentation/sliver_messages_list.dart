@@ -5,8 +5,8 @@ import 'package:grpc_chat/src/features/chat/application/chat_service.dart';
 import 'package:grpc_chat/src/features/chat/data/chat_repository.dart';
 import 'package:grpc_chat/src/features/chat/presentation/widgets/message_list_item.dart';
 
-class MessagesList extends ConsumerWidget {
-  const MessagesList({super.key});
+class SliverMessagesList extends ConsumerWidget {
+  const SliverMessagesList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,17 +15,21 @@ class MessagesList extends ConsumerWidget {
     return AsyncValueWidget(
       value: messageValue,
       data: (message) {
-        return ListView.builder(
-          itemCount: message.length,
-          itemBuilder: (context, index) {
-            final chatMessage = message[index];
-            return MessageListItem(
-              message: chatMessage.content,
-              sender: chatMessage.sender,
-              timestamp: chatMessage.createdAt,
-              isMe: chatMessage.sender == me,
-            );
-          },
+        return CustomScrollView(
+          slivers: [
+            SliverList.builder(
+              itemCount: message.length,
+              itemBuilder: (context, index) {
+                final chatMessage = message[index];
+                return MessageListItem(
+                  message: chatMessage.content,
+                  sender: chatMessage.sender,
+                  timestamp: chatMessage.createdAt,
+                  isMe: chatMessage.sender == me,
+                );
+              },
+            ),
+          ],
         );
       },
     );
