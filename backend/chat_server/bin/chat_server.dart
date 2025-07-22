@@ -33,7 +33,6 @@ class ChatServer extends ChatServiceBase {
     request.listen((request) {
       print('Connected: ${request.sender} #${request.hashCode}');
       // Assign a unique ID and timestamp to the message
-      request.id = Uuid().v1();
       request.createdAt = Timestamp.fromDateTime(DateTime.now());
 
       if (_messagesCache.length >= 100) {
@@ -44,9 +43,7 @@ class ChatServer extends ChatServiceBase {
       _messagesCache.add(request);
 
       _controllers.forEach((controller, _) {
-        if (controller != clientController) {
-          controller.sink.add(request);
-        }
+        controller.sink.add(request);
       });
     }).onError((e) {
       print(e);
